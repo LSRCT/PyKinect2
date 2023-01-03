@@ -279,6 +279,22 @@ class PyKinectRuntime(object):
             else:
                 return None
 
+    def get_camera_intrinsics(self):
+        """
+        Read camera intrinsics from the sensor.
+        Note: This only works after the sensor has been initialized and will return zeros otherwise.
+        Source: https://stackoverflow.com/questions/52754768/depth-camera-intrinsics-for-kinect-v2
+        """
+        sensor_intrinsics = self._mapper.GetDepthCameraIntrinsics()
+        fx = sensor_intrinsics.FocalLengthX
+        fy = sensor_intrinsics.FocalLengthY
+        cx = sensor_intrinsics.PrincipalPointX
+        cy = sensor_intrinsics.PrincipalPointY
+        d0 = sensor_intrinsics.RadialDistortionSecondOrder
+        d1 = sensor_intrinsics.RadialDistortionFourthOrder
+        d2 = sensor_intrinsics.RadialDistortionSixthOrder
+        return fx, fy, cx, cy, d0, d1, d2
+
 
     def body_joint_to_color_space(self, joint): 
         return self._mapper.MapCameraPointToColorSpace(joint.Position) 
