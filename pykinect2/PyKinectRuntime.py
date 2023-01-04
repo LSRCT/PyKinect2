@@ -296,6 +296,25 @@ class PyKinectRuntime(object):
         return fx, fy, cx, cy, d0, d1, d2
 
 
+    def get_depth_to_color_map(self):
+        """
+        Read depth to color map from the sensor.
+        This is a 1D array of ColorSpacePoint objects
+        Each entry contains the x and y coordinates indicating the color pixel that corresponds to the depth pixel.
+        Calling this makes no sense if no depth frame is available.
+        """
+        # TODO maybe we shouldnt keep creating this array every time
+        depth_to_color = ctypes.POINTER(PyKinectV2._ColorSpacePoint)
+        depth_to_color_capacity = self._depth_frame_data_capacity
+        depth_to_color_data_type = PyKinectV2._ColorSpacePoint * depth_to_color_capacity.value
+        depth_to_color = ctypes.cast(depth_to_color_data_type(), ctypes.POINTER(PyKinectV2._ColorSpacePoint))
+        self._mapper.MapDepthFrameToColorSpace(depthFrameData=self._depth_frame_data, 
+                                                            depthPointCount=depth_to_color_capacity, 
+                                                            colorPointCount=depth_to_color_capacity,
+                                                            colorSpacePoints=depth_to_color
+                                                            )
+        return depth_to_color
+
     def body_joint_to_color_space(self, joint): 
         return self._mapper.MapCameraPointToColorSpace(joint.Position) 
 
